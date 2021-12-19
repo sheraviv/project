@@ -30,10 +30,30 @@
 
 .invisible {
   visibility: hidden;
+  
 }
 
-.fade-in-visible {
-  animation: fadeIn 1s;
+.text-control {
+  margin-top: 0px;
+    margin-bottom: 0px;
+    height: 40px;
+}
+
+.del-button {
+
+  border-top-width: 0px;
+  border-bottom-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  padding-right: 0px;
+  padding-left: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+
+}
+
+.fade-in {
+  animation: fadeIn 2s;
 }
 
 @keyframes fadeIn {
@@ -43,4 +63,8 @@
   100% {
     opacity: 1;
   }
+}
+
+.scroll {
+  overflow: scroll;
 }
