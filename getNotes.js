@@ -3,6 +3,7 @@ const DOM = {
     year: null,
     time: null,
     notesContainer: null,
+    
 }
 
 const CONFIG = { NOTES: "notes"};
@@ -17,6 +18,16 @@ function init() {
     DOM.notesContainer = document.querySelector("#notesContainer");
     const button = document.querySelector("#addNotes");
     button.addEventListener("click", addNotes);
+    const resetButton = document.querySelector("#resetInputs");
+    resetButton.addEventListener("click", function () {
+       document.querySelector("#yourNotes").value = "";
+       document.querySelector("#time").value = "";
+       document.querySelector("#year").value = "";
+
+
+
+    });
+
 
     try {
         const notesString = localStorage.getItem(CONFIG.NOTES);
@@ -63,19 +74,20 @@ function addNotes() {
     setNotes(state.notes);
 
     function _getNoteId() {
-        const note = DOM.yourNotes || "";
-        return `location_${note}_${Math.ceil(Math.random() * 999)}`;
+        const note = DOM.notesContainer || "";
+        return `notes_${note}_${Math.ceil(Math.random() * 999)}`;
     };
 
 };
 
 
 
-function getNotes(yourNotes, year, time) {
+function getNotes(yourNotes, year, time, id) {
     return {
         yourNotes,
         year,
         time,
+        id,
     };
 }
 
@@ -88,12 +100,14 @@ function getNotes(yourNotes, year, time) {
 function getNotesUI(note) {
     const outerDiv = document.createElement("div");
     outerDiv.className = "card";
+    outerDiv.classList.add("fade-in");
+
     outerDiv.style.width = "18rem";
     outerDiv.style.height = "250px"
 
 
     const insideDiv = document.createElement("div");
-    insideDiv.className = "card-body row sticker";
+    insideDiv.className = "card-body row sticker scroll";
 
     const getDate = document.createElement("h5");
     getDate.innerText = note.year;
@@ -105,19 +119,35 @@ function getNotesUI(note) {
     
     const getText = document.createElement("p");
     getText.innerText = note.yourNotes;
-    getText.className = "card-text fst-italic";
+    getText.className = "card-text fst-italic scroll";
+    
+
+
+    const divButton = document.createElement("div");
+    divButton.className;
+
 
     const deleteButton = _deleteButton();
 
     outerDiv.append(insideDiv);
-    insideDiv.append(getDate, getTime, getText, deleteButton);
+    divButton.append(deleteButton);
+    insideDiv.append(divButton, getDate, getTime, getText);
 
-    outerDiv.addEventListener("mouseenter" , function() {
-        const currentNote = getNoteById(note.id, state.notes);
-        draw(state.notes);
+    outerDiv.id = note.id;
+    console.log(outerDiv);
 
+    outerDiv.addEventListener("mouseenter", function () {
+        this.querySelector(".deleteMeButton").classList.remove("invisible");
+        this.querySelector(".deleteMeButton").style.display = "block";
+        this.querySelector(".deleteMeButton").classList.add("fade-in-visivle");
+
+    });
+
+    outerDiv.addEventListener("mouseleave", function () {
+        this.querySelector(".deleteMeButton").style.display = "none";
     })
 
+   
 
     
     return outerDiv;
@@ -125,9 +155,8 @@ function getNotesUI(note) {
 
     function _deleteButton() {
         const button = document.createElement("button");
-        button.classList.add("btn", "btn-danger");
-        // button.style.display = "none";
-        button.classList.add("fade-in-visible");
+        button.classList.add("btn", "btn-danger", "del-button" , "invisible");
+        button.classList.add("fade-in");
         button.classList.add("deleteMeButton");
         button.onclick = function () {
             const noteIndex = getNoteByIndex(note.id, state.notes);
@@ -136,19 +165,19 @@ function getNotesUI(note) {
             draw(state.notes);
             localStorage.setItem(CONFIG.NOTES, JSON.stringify(state.notes));
             setNotes(state.notes);
-
+            
         };
         const trashIcon = document.createElement("i");
         trashIcon.classList.add("bi", "bi-x");
         button.append(trashIcon);
-
         return button;
+
     }
 };
 
 function getNoteById(id, notes) {
     if (typeof id !== "string") return;
-    if (!Array.isArray(notes)) return;
+ 
     for (let index = 0; index < notes.length; index++) {
         const currentNote = notes[index];
         if (currentNote.id === id) {
@@ -160,6 +189,7 @@ function getNoteById(id, notes) {
 
 function getNoteByIndex (id, notes) {
     // if (typeof id !== "string") return;
+    if (!Array.isArray(notes)) return;
     for (let index = 0; index < notes.length; index++) {
         const currentNote = notes[index];
         if (currentNote.id === id) {
